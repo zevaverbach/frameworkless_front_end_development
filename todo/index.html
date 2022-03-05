@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/todomvc-common@1.0.5/base.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/todomvc-app-css@2.1.2/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.js"></script>
+    <title>TODO MVC</title>
+  </head>
+  <body>
+    <section class="todoapp">
+      <header class="header">
+        <h1>todos</h1>
+        <input class="new-todo" placeholder="What needs to be done?" autofocus="">
+      </header>
+      <section class="main">
+        <input id="toggle-all" class="toggle-all" type="checkbox">
+        <label for="toggle-all">Mark all as complete</label>
+        <ul class="todo-list"></ul>
+      </section>
+      <footer class="footer">
+        <span class="todo-count"></span>
+        <ul class="filters">
+          <li>
+            <a href="#/">All</a>
+          </li>
+          <li>
+            <a href="#/active">Active</a>
+          </li>
+          <li>
+            <a href="#/completed">Completed</a>
+          </li>
+        </ul>
+        <button class="clear-completed">
+          Clear completed
+        </button>
+      </footer>
+    </section>
+    <footer class="info">
+      <p>Double-click to edit a todo</p>
+    </footer>
+    <script>
+      const makeId = text => text.toLowerCase().replace(' ', '-')
+      const createTodoElement = todo => {
+        const { text, completed } = todo
+        const li = document.createElement('li')
+        if (completed) {
+          li.classList.add('completed')
+        }
+        li.id = makeId(text)
+        const div = document.createElement('div')
+        div.classList.add('view')
+        li.appendChild(div)
+        const checkbox = document.createElement('input')
+        checkbox.type = 'checkbox'
+        checkbox.classList.add('toggle')
+        if (completed) {
+          checkbox.checked = true
+        }
+        label = document.createElement('label')
+        label.innerText = text
+        button = document.createElement('button')
+        button.classList.add('destroy')
+        div.append(checkbox, label, button)
+        editInput = document.createElement('input')
+        editInput.value = text
+        editInput.class = "edit"
+        j
+
+
+        return `
+          <li ${completed ? 'class="completed"' : ''}>
+            <div class="view">
+              <input ${completed ? 'checked' : ''} class="toggle" type="checkbox">
+              <label>${text}</label>
+              <button class="destroy"></button>
+            </div>
+            <input class="edit" value="${text}">
+          </li>
+        `
+      }
+
+      const getTodoCount = todoObjects => {
+        const numIncomplete = todoObjects.filter(todo => !todo.completed).length
+        return numIncomplete === 1 ? '1 item left' : `${numIncomplete} items left`
+      }
+
+      const view = (targetElement, state) => {
+        const { currentFilter, todoObjects } = state
+        const element = targetElement.cloneNode(true)
+        const list = element.querySelector('.todo-list')
+        const counter = element.querySelector('.todo-count')
+        const filters = element.querySelector('.filters')
+
+        list.children = todoObjects.map(createTodoElement)
+        counter.textContent = getTodoCount(todoObjects)
+
+        Array
+          .from(filters.querySelectorAll('li a'))
+          .forEach(a => {
+            if (a.textContent === currentFilter) {
+              a.classList.add('selected')
+            } else {
+              a.classList.remove('selected')
+            }
+          })
+        return element
+      }
+
+      const { random } = faker
+      const { words, boolean } = random
+      const repeat = (elementFactory, number) => Array.from({length: number}, elementFactory)
+      const generateTodoObjects = () => repeat(() => ({text: words(2), completed: boolean()}), faker.random.number(10))
+
+      const state = {
+        todoObjects: generateTodoObjects(),
+        currentFilter: "All",
+      }
+
+      const main = document.querySelector('.todoapp')
+      window.requestAnimationFrame(() => main.replaceWith(view(main, state)))
+    </script>
+  </body>
+</html>
